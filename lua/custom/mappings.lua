@@ -9,6 +9,8 @@ M.general = {
   }
 }
 
+
+
 M.dap = {
   plugin = true,
   n = {
@@ -24,6 +26,20 @@ M.dap_python = {
         require('dap-python').test_method()
       end
     }
+  }
+}
+
+-- Copilot mappings for accepting suggestions
+
+M.copilot = {
+  i = {
+    ["<C-l>"] = {
+      function()
+        vim.fn.feedkeys(vim.fn['copilot#Accept'](), '')
+      end,
+      "Copilot Accept",
+       {replace_keycodes = true, nowait=true, silent=true, expr=true, noremap=true}
+      }
   }
 }
 
