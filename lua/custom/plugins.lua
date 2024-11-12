@@ -79,6 +79,7 @@ local plugins = {
         "black",
         "debugpy",
         "typescript-language-server",
+        "asm-lsp",
       }
     }
   }

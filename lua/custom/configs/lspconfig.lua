@@ -44,3 +44,9 @@ lspconfig.tsserver.setup({
   end,
   capabilities = capabilities,
 })
+
+lspconfig.asm_lsp.setup({
+  on_attach=on_attach,
+  capabilities=capabilities,
+  filetypes = {"asm"}
+})
