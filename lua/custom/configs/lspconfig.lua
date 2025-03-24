@@ -1,6 +1,16 @@
 local base = require("plugins.configs.lspconfig")
-local on_attach = base.on_attach
+local default_on_attach = base.on_attach
 local capabilities = base.capabilities
+
+local function on_attach(client, bufnr)
+  default_on_attach(client, bufnr)
+  if client.server_capabilities.signatureHelpProvider then
+    client.server_capabilities.signatureHelpProvider = false
+  end
+  if client.server_capabilities.inlayHintProvider then
+    vim.lsp.inlay_hint.enable(true)
+  end
+end
 
 local lspconfig = require("lspconfig")
 
@@ -13,17 +23,24 @@ lspconfig.clangd.setup({
 })
 
 lspconfig.pyright.setup({
-  on_attach = on_attach,
+  on_attach = default_on_attach,
   capabilities = capabilities,
   filetypes = {"python"},
 })
 
 lspconfig.rust_analyzer.setup({
-  on_attach = on_attach,
+  on_attach = function (client, bufnr)
+    default_on_attach(client, bufnr)
+    vim.lsp.inlay_hint.enable(true)
+    
+  end,
   capabilities = capabilities,
 })
 
-lspconfig.ts_ls.setup({
-  on_attach = on_attach,
+lspconfig.tsserver.setup({
+  on_attach = function (client, bufnr)
+    default_on_attach(client, bufnr)
+    vim.lsp.inlay_hint.enable(true)
+  end,
   capabilities = capabilities,
 })
