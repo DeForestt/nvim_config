@@ -54,7 +54,19 @@ local plugins = {
   },
   {
     "jose-elias-alvarez/null-ls.nvim",
-    ft = {"python"},
+    ft = {
+      "python",
+      "javascript",
+      "typescript",
+      "javascriptreact",
+      "typescriptreact",
+      "vue",
+      "html",
+      "css",
+      "json",
+      "yaml",
+      "markdown",
+    },
     opts = function()
       return require "custom.configs.null-ls"
     end
@@ -65,6 +77,23 @@ local plugins = {
       require "plugins.configs.lspconfig"
       require "custom.configs.lspconfig"
     end
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        "lua",
+        "vim",
+        "vimdoc",
+        "html",
+        "css",
+        "javascript",
+        "typescript",
+        "tsx",
+        "json",
+        "vue",
+      },
+    },
   },
   {
     "williamboman/mason.nvim",
@@ -79,6 +108,9 @@ local plugins = {
         "black",
         "debugpy",
         "typescript-language-server",
+        "vue-language-server",
+        "eslint_d",
+        "prettier",
       }
     }
   }

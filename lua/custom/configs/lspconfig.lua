@@ -43,4 +43,21 @@ lspconfig.tsserver.setup({
     vim.lsp.inlay_hint.enable(true)
   end,
   capabilities = capabilities,
+  filetypes = {
+    "javascript",
+    "javascriptreact",
+    "javascript.jsx",
+    "typescript",
+    "typescriptreact",
+    "typescript.tsx",
+  },
+})
+
+lspconfig.volar.setup({
+  on_attach = function (client, bufnr)
+    default_on_attach(client, bufnr)
+    vim.lsp.inlay_hint.enable(true)
+  end,
+  capabilities = capabilities,
+  filetypes = { "vue" },
 })
