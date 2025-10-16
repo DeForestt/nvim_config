@@ -16,7 +16,7 @@ local function on_attach(client, bufnr)
   end
 end
 
-local lspconfig = require("lspconfig")
+local lspconfig = vim.lsp and vim.lsp.config or require("lspconfig")
 
 lspconfig.clangd.setup({
   on_attach = function(client, bufnr)
