@@ -77,6 +77,13 @@ M.load_mappings = function(section, mapping_opt)
     local mappings = require("core.utils").load_config().mappings
 
     if type(section) == "string" then
+      if not mappings[section] then
+        vim.schedule(function()
+          vim.notify(string.format("No mappings registered for section '%s'", section), vim.log.levels.WARN)
+        end)
+        return
+      end
+
       mappings[section]["plugin"] = nil
       mappings = { mappings[section] }
     end

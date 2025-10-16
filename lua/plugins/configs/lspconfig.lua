@@ -3,7 +3,7 @@ require "nvchad.lsp"
 
 local M = {}
 local utils = require "core.utils"
-local lspconfig = vim.lsp and vim.lsp.config or require "lspconfig"
+local compat = require "custom.utils.lspconfig_compat"
 
 -- export on_attach & capabilities for custom lspconfigs
 M.on_attach = function(client, bufnr)
@@ -48,7 +48,7 @@ M.capabilities.textDocument.completion.completionItem = {
   },
 }
 
-lspconfig.lua_ls.setup {
+compat.setup("lua_ls", {
   on_init = M.on_init,
   on_attach = M.on_attach,
   capabilities = M.capabilities,
@@ -70,6 +70,6 @@ lspconfig.lua_ls.setup {
       },
     },
   },
-}
+})
 
 return M
