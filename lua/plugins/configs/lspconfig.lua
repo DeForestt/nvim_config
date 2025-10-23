@@ -49,7 +49,19 @@ M.capabilities.textDocument.completion.completionItem = {
 
 local configs = require("lspconfig.configs")
 
-local lua_ls = configs.lua_ls
+local function load_server(name)
+  local server = configs[name]
+  if server then
+    return server
+  end
+
+  local ok = pcall(require, "lspconfig.server_configurations." .. name)
+  if ok then
+    return configs[name]
+  end
+end
+
+local lua_ls = load_server "lua_ls"
 
 if not lua_ls then
   vim.notify("lua_ls server definition is missing from nvim-lspconfig", vim.log.levels.ERROR)

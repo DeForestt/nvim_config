@@ -18,12 +18,29 @@ end
 
 local configs = require("lspconfig.configs")
 
-local function get_server(name)
+local function load_server(name)
   local server = configs[name]
-  if not server then
-    vim.notify("LSP server '" .. name .. "' is not available in nvim-lspconfig", vim.log.levels.WARN)
+  if server then
+    return server
   end
-  return server
+
+  local ok = pcall(require, "lspconfig.server_configurations." .. name)
+  if ok then
+    return configs[name]
+  end
+end
+
+local function get_server(name, ...)
+  local candidates = { name, ... }
+
+  for _, candidate in ipairs(candidates) do
+    local server = load_server(candidate)
+    if server then
+      return server
+    end
+  end
+
+  vim.notify("LSP server '" .. name .. "' is not available in nvim-lspconfig", vim.log.levels.WARN)
 end
 
 local clangd = get_server "clangd"
@@ -60,7 +77,7 @@ end
 -- TypeScript / JavaScript
 -- Prefer the new server name "ts_ls" (typescript-language-server).
 -- If your lspconfig is older, keep `tsserver` and the settings block is the same.
-local ts_server = get_server "ts_ls" or get_server "tsserver"
+local ts_server = get_server("ts_ls", "tsserver")
 if ts_server then
   ts_server.setup({
     on_attach = function(client, bufnr)
@@ -82,9 +99,9 @@ end
 local volar = get_server "volar"
 if volar then
   volar.setup({
-    on_attach = function (client, bufnr)
+    on_attach = function(client, bufnr)
       default_on_attach(client, bufnr)
-      vim.lsp.inlay_hint.enable(true)
+      vim.lsp.inlay_hint.enable(bufnr, true)
     end,
     capabilities = capabilities,
     filetypes = { "vue" },
