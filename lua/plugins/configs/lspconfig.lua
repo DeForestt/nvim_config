@@ -47,7 +47,16 @@ M.capabilities.textDocument.completion.completionItem = {
   },
 }
 
-require("lspconfig").lua_ls.setup {
+local configs = require("lspconfig.configs")
+
+local lua_ls = configs.lua_ls
+
+if not lua_ls then
+  vim.notify("lua_ls server definition is missing from nvim-lspconfig", vim.log.levels.ERROR)
+  return M
+end
+
+lua_ls.setup {
   on_init = M.on_init,
   on_attach = M.on_attach,
   capabilities = M.capabilities,

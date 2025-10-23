@@ -16,58 +16,79 @@ local function on_attach(client, bufnr)
   end
 end
 
-local lspconfig = require("lspconfig")
+local configs = require("lspconfig.configs")
 
-lspconfig.clangd.setup({
-  on_attach = function(client, bufnr)
-    client.server_capabilities.signatureHelpProvider = false
-    on_attach(client, bufnr)
-  end,
-  capabilities = capabilities,
-})
+local function get_server(name)
+  local server = configs[name]
+  if not server then
+    vim.notify("LSP server '" .. name .. "' is not available in nvim-lspconfig", vim.log.levels.WARN)
+  end
+  return server
+end
 
-lspconfig.pyright.setup({
-  on_attach = default_on_attach,
-  capabilities = capabilities,
-  filetypes = {"python"},
-})
+local clangd = get_server "clangd"
+if clangd then
+  clangd.setup({
+    on_attach = function(client, bufnr)
+      client.server_capabilities.signatureHelpProvider = false
+      on_attach(client, bufnr)
+    end,
+    capabilities = capabilities,
+  })
+end
 
-lspconfig.rust_analyzer.setup({
-  on_attach = function(client, bufnr)
-    default_on_attach(client, bufnr)
-    vim.lsp.inlay_hint.enable(bufnr, true)
-  end,
-  capabilities = capabilities,
-})
+local pyright = get_server "pyright"
+if pyright then
+  pyright.setup({
+    on_attach = default_on_attach,
+    capabilities = capabilities,
+    filetypes = {"python"},
+  })
+end
+
+local rust_analyzer = get_server "rust_analyzer"
+if rust_analyzer then
+  rust_analyzer.setup({
+    on_attach = function(client, bufnr)
+      default_on_attach(client, bufnr)
+      vim.lsp.inlay_hint.enable(bufnr, true)
+    end,
+    capabilities = capabilities,
+  })
+end
 
 -- TypeScript / JavaScript
 -- Prefer the new server name "ts_ls" (typescript-language-server).
 -- If your lspconfig is older, keep `tsserver` and the settings block is the same.
-local ts_server = lspconfig.ts_ls or lspconfig.tsserver
-ts_server.setup({
-  on_attach = function(client, bufnr)
-    default_on_attach(client, bufnr)
-    vim.lsp.inlay_hint.enable(bufnr, true)
-  end,
-  capabilities = capabilities,
-  filetypes = {
-    "javascript",
-    "javascriptreact",
-    "javascript.jsx",
-    "typescript",
-    "typescriptreact",
-    "typescript.tsx",
-  },
-})
+local ts_server = get_server "ts_ls" or get_server "tsserver"
+if ts_server then
+  ts_server.setup({
+    on_attach = function(client, bufnr)
+      default_on_attach(client, bufnr)
+      vim.lsp.inlay_hint.enable(bufnr, true)
+    end,
+    capabilities = capabilities,
+    filetypes = {
+      "javascript",
+      "javascriptreact",
+      "javascript.jsx",
+      "typescript",
+      "typescriptreact",
+      "typescript.tsx",
+    },
+  })
+end
 
-lspconfig.volar.setup({
-  on_attach = function (client, bufnr)
-    default_on_attach(client, bufnr)
-    vim.lsp.inlay_hint.enable(true)
-  end,
-  capabilities = capabilities,
-  filetypes = { "vue" },
-  settings = {
+local volar = get_server "volar"
+if volar then
+  volar.setup({
+    on_attach = function (client, bufnr)
+      default_on_attach(client, bufnr)
+      vim.lsp.inlay_hint.enable(true)
+    end,
+    capabilities = capabilities,
+    filetypes = { "vue" },
+    settings = {
     -- You need BOTH sections if you also edit JS.
     typescript = {
       inlayHints = {
@@ -93,20 +114,24 @@ lspconfig.volar.setup({
         includeInlayEnumMemberValueHints = true,
       },
     },
-  },
+    },
 
-  init_options = {
-     hostInfo = "neovim",
-     preferences = {}, -- you can leave empty; settings above control inlay hints
-     tsserver = {
-       path = vim.fn.getcwd() .. "/node_modules/typescript/lib/tsserverlibrary.js",
+    init_options = {
+       hostInfo = "neovim",
+       preferences = {}, -- you can leave empty; settings above control inlay hints
+       tsserver = {
+         path = vim.fn.getcwd() .. "/node_modules/typescript/lib/tsserverlibrary.js",
+       },
      },
-   },
-})
+  })
+end
 
-lspconfig.asm_lsp.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  filetypes = {"asm"},
-})
+local asm_lsp = get_server "asm_lsp"
+if asm_lsp then
+  asm_lsp.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+    filetypes = {"asm"},
+  })
+end
 
