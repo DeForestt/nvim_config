@@ -55,10 +55,24 @@ local function load_server(name)
     return server
   end
 
-  local ok = pcall(require, "lspconfig.server_configurations." .. name)
-  if ok then
+  local function try_require(module)
+    local ok, definition = pcall(require, module)
+    if not ok or type(definition) ~= "table" then
+      return nil
+    end
+
+    -- Register the server with lspconfig's configs table. The table uses a
+    -- metatable to produce the familiar setup() API when a definition is
+    -- assigned, so we simply assign the definition once it's available.
+    if not configs[name] then
+      configs[name] = definition
+    end
+
     return configs[name]
   end
+
+  return try_require("lspconfig.server_configurations." .. name)
+    or try_require("lspconfig.configs." .. name)
 end
 
 local lua_ls = load_server "lua_ls"
@@ -92,4 +106,7 @@ lua_ls.setup {
   },
 }
 
+M.load_server = load_server
+
 return M
+

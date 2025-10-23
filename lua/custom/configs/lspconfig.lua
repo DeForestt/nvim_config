@@ -1,6 +1,7 @@
 local base = require("plugins.configs.lspconfig")
 local default_on_attach = base.on_attach
 local capabilities = base.capabilities
+local load_server = base.load_server
 
 local function on_attach(client, bufnr)
   default_on_attach(client, bufnr)
@@ -13,20 +14,6 @@ local function on_attach(client, bufnr)
   -- Neovim 0.10+ API (bufnr first)
   if client.server_capabilities.inlayHintProvider then
     vim.lsp.inlay_hint.enable(bufnr, true)
-  end
-end
-
-local configs = require("lspconfig.configs")
-
-local function load_server(name)
-  local server = configs[name]
-  if server then
-    return server
-  end
-
-  local ok = pcall(require, "lspconfig.server_configurations." .. name)
-  if ok then
-    return configs[name]
   end
 end
 
