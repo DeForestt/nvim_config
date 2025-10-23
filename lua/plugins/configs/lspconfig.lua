@@ -47,7 +47,42 @@ M.capabilities.textDocument.completion.completionItem = {
   },
 }
 
-require("lspconfig").lua_ls.setup {
+local configs = require("lspconfig.configs")
+
+local function load_server(name)
+  local server = configs[name]
+  if server then
+    return server
+  end
+
+  local function try_require(module)
+    local ok, definition = pcall(require, module)
+    if not ok or type(definition) ~= "table" then
+      return nil
+    end
+
+    -- Register the server with lspconfig's configs table. The table uses a
+    -- metatable to produce the familiar setup() API when a definition is
+    -- assigned, so we simply assign the definition once it's available.
+    if not configs[name] then
+      configs[name] = definition
+    end
+
+    return configs[name]
+  end
+
+  return try_require("lspconfig.server_configurations." .. name)
+    or try_require("lspconfig.configs." .. name)
+end
+
+local lua_ls = load_server "lua_ls"
+
+if not lua_ls then
+  vim.notify("lua_ls server definition is missing from nvim-lspconfig", vim.log.levels.ERROR)
+  return M
+end
+
+lua_ls.setup {
   on_init = M.on_init,
   on_attach = M.on_attach,
   capabilities = M.capabilities,
@@ -71,4 +106,7 @@ require("lspconfig").lua_ls.setup {
   },
 }
 
+M.load_server = load_server
+
 return M
+
